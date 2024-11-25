@@ -1,4 +1,69 @@
-# Key Trading Terminologies
+
+# Financial Assets
+
+A broad category that includes any non-physical asset with monetary value.
+These are typically traded or held for investment, financing, or hedging purposes.
+
+## Categories of Financial Assets
+
+### 1. **Equity Securities**
+- Represent **ownership** in an entity.
+- Key Features:
+  - Shareholders may receive dividends and have voting rights.
+  - Value depends on the issuing company’s performance and market conditions.
+- Examples:
+  - **Common Stocks**: Provide ownership and voting rights.
+  - **Preferred Stocks**: Offer fixed dividends with no voting rights.
+
+---
+
+### 2. **Debt Securities**
+- Represent a **loan relationship** where the issuer borrows funds from the investor.
+- Key Features:
+  - Regular interest payments (coupons).
+  - Repayment of principal at maturity.
+- Examples:
+  - **Bonds**: Secured or unsecured long-term debt.
+  - **Treasury Bills**: Short-term government debt.
+  - **Debentures**: Unsecured debt without collateral.
+
+---
+
+### 3. **Derivatives**
+- Financial contracts whose value is derived from an underlying asset or benchmark.
+- Key Features:
+  - Used for hedging or speculation.
+  - Value fluctuates with the underlying asset (e.g., stocks, commodities).
+- Examples:
+  - **Options**: Right to buy/sell an asset at a specified price within a timeframe.
+  - **Futures**: Obligation to buy/sell an asset at a predetermined date and price.
+  - **Swaps**: Exchange of cash flows between two parties (e.g., interest rate swaps).
+
+---
+
+### 4. **Hybrid Securities**
+- Combine characteristics of both equity and debt securities.
+- Key Features:
+  - Offer flexibility in risk and return.
+  - Can be converted or prioritized depending on terms.
+- Examples:
+  - **Convertible Bonds**: Bonds that can be converted into equity shares.
+  - **Preferred Shares**: Hybrid securities offering fixed dividends and seniority over common stock in liquidation.
+
+---
+
+### 5. **Cash and Cash Equivalents**
+- Highly liquid financial assets used for immediate transactions or short-term investments.
+- Key Features:
+  - Low risk and low return.
+  - Easily converted into cash.
+- Examples:
+  - **Cash Deposits**: Bank accounts with on-demand withdrawals.
+  - **Money Market Funds**: Short-term, low-risk investment funds.
+  - **Treasury Bills**: Short-term government-issued securities.
+
+
+------------------------------------------------------------------------------
 
 ## General
 - **Market Order**: Buy/sell immediately at the best available price.
