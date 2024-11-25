@@ -1,6 +1,7 @@
-pub mod client;
+#[macro_use]
+extern crate diesel;
 pub mod market_data;
-pub mod misc;
+pub mod schema;
 
 #[tokio::main]
 async fn main() {}
