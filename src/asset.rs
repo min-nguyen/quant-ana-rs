@@ -11,7 +11,11 @@ pub struct StockAsset {
     company: String,
 }
 
-pub enum CurrencyAsset {
+pub struct BondAsset {
+    issuer: String,
+}
+
+pub enum CashAsset {
     USD,
     EUR,
     BTC,
