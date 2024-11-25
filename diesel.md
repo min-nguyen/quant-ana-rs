@@ -13,9 +13,10 @@ sudo apt install libfl-dev
 sudo apt install -y postgresql-common
 sudo apt-get install postgresql-client
 sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
-####### conf is stored in /etc/postgresql/17/main
+####### (conf is stored in /etc/postgresql/17/main)
 sudo -u postgres psql template1
-ALTER USER postgres with encrypted password 'pw';
+> ALTER USER postgres with encrypted password 'pw';
+> exit
 
 ## Install Diesel cli [https://diesel.rs/guides/getting-started]
 sudo apt-get install libssl-dev
