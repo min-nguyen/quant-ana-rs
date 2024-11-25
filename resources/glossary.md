@@ -29,6 +29,17 @@ These are typically traded or held for investment, financing, or hedging purpose
 
 ---
 
+### 4. **Hybrid Securities**
+- Combine characteristics of both equity and debt securities.
+- Key Features:
+  - Offer flexibility in risk and return.
+  - Can be converted or prioritized depending on terms.
+- Examples:
+  - **Convertible Bonds**: Bonds that can be converted into equity shares.
+  - **Preferred Shares**: Hybrid securities offering fixed dividends and seniority over common stock in liquidation.
+
+---
+
 ### 3. **Derivatives**
 - Financial contracts whose value is derived from an underlying asset or benchmark.
 - Key Features:
@@ -38,17 +49,6 @@ These are typically traded or held for investment, financing, or hedging purpose
   - **Options**: Right to buy/sell an asset at a specified price within a timeframe.
   - **Futures**: Obligation to buy/sell an asset at a predetermined date and price.
   - **Swaps**: Exchange of cash flows between two parties (e.g., interest rate swaps).
-
----
-
-### 4. **Hybrid Securities**
-- Combine characteristics of both equity and debt securities.
-- Key Features:
-  - Offer flexibility in risk and return.
-  - Can be converted or prioritized depending on terms.
-- Examples:
-  - **Convertible Bonds**: Bonds that can be converted into equity shares.
-  - **Preferred Shares**: Hybrid securities offering fixed dividends and seniority over common stock in liquidation.
 
 ---
 
@@ -62,6 +62,45 @@ These are typically traded or held for investment, financing, or hedging purpose
   - **Money Market Funds**: Short-term, low-risk investment funds.
   - **Treasury Bills**: Short-term government-issued securities.
 
+```
+Financial Assets
+├── Equity Securities
+│   ├── Stocks
+│   ├── ETFs (Exchange-Traded Funds)
+│   └── REITs (Real Estate Investment Trusts)
+│
+├── Debt Securities
+│   ├── Bonds (Government, Corporate, Municipal)
+│   ├── Money Market Instruments (T-Bills, Commercial Paper)
+│   └── Structured Debt (MBS, ABS)
+│
+├── Derivatives
+│   ├── Options (Call, Put)
+│   ├── Futures
+│   ├── Swaps
+│   └── Forwards
+│
+├── Commodities
+│   ├── Energy (Oil, Gas)
+│   ├── Metals (Gold, Silver)
+│   ├── Agriculture (Grains, Softs)
+│   └── Livestock
+│
+├── Currencies
+│   ├── Major Pairs (e.g., EUR/USD)
+│   ├── Minor Pairs (e.g., GBP/AUD)
+│   └── Exotic Pairs (e.g., USD/TRY)
+│
+├── Cryptocurrencies
+│   ├── Coins (BTC, ETH)
+│   └── Tokens (Utility, Security, Stablecoins)
+│
+└── Alternative Investments
+    ├── Private Equity
+    ├── Hedge Funds
+    ├── Venture Capital
+    └── Real Estate
+```
 
 ------------------------------------------------------------------------------
 
