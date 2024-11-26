@@ -111,6 +111,15 @@ Financial Assets
 - **Take-Profit**: An order to close a position once a target profit level is reached.
 
 ## Market Dynamics
+- **Market price**: The current price at which a financial asset can be bought or sold in the marketplace.
+   It is determined by either:
+    1. The most recent transaction.
+       Typically considered the "official" market price for reporting and analytics.
+    2. Best Available Price in the Order Book.
+       Relevant when executing *Market Orders* immediately.
+        The Best Ask Price: The lowest price at which a seller is willing to sell.
+        The Best Bid Price: The highest price a buyer is willing to pay.
+    The context determines which definition of market price is more relevant.
 - **Bid-Ask Spread**: The difference between the highest bid and lowest ask price.
 - **Liquidity**: How easily an asset can be bought/sold without affecting price.
 - **Volume**: The number of shares/contracts traded in a period.
