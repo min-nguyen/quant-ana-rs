@@ -12,12 +12,15 @@ pub struct OrderBook {
     // Mapping of ordered prices to lists of orders
     buy_orders: BTreeMap<u64, Vec<Order>>,
     sell_orders: BTreeMap<u64, Vec<Order>>,
+    // id_counter: u64,
 }
+
 impl OrderBook {
     pub fn new() -> OrderBook {
         OrderBook {
             buy_orders: BTreeMap::new(),
             sell_orders: BTreeMap::new(),
+            // id_counter: 0,
         }
     }
 
@@ -40,6 +43,13 @@ impl OrderBook {
 
     pub fn best_sell_price(&self) -> Option<u64> {
         self.sell_orders.first_key_value().map(|kv| *kv.0)
+    }
+
+    pub fn market_price(&self, side: OrderSide) -> Option<u64> {
+        match side {
+            OrderSide::Buy => self.best_buy_price(),
+            OrderSide::Sell => self.best_sell_price(),
+        }
     }
 }
 
