@@ -96,13 +96,22 @@ Execute Match
                The matched order is left with a buy/sell quantity > 0.
                The matched order is then readded into the order book.
     If no match is possible, in the case of either:
-        1. a limit order that cannot be satisfied yet
-        or/and
-        2. no orders on the opposite side of the book,
-    The incoming order is added to the book.
+        1. an incoming limit order that cannot be satisfied yet
+           then the incoming limit order is added to the book.
+        2. a market order with no orders on the opposite side of the book,
+            then the market order is rejected and never added to the book, as it is designed to execute immediately.
 
 Orders are added and organised in the book by
     1. Price Priority: Higher buy prices and lower sell prices are given priority.
     2. Time Priority: For orders with the same price, earlier orders are processed first.
     Hence when matching orders, the best price on the opposite side of the book is selected,
     and within that price, the oldest order is matched first.
+
+Order Type	Visible in Book?	Behavior
+Limit Orders	Yes	Fully visible in the book.
+Stop-Limit Orders	Yes (after triggering)	Becomes a limit order and is placed in the book.
+Iceberg Orders	Partially visible	Only the visible portion is in the book.
+Pegged Orders	Yes	Dynamically adjusts price in the book.
+Market Orders	No	Executes immediately, does not sit in the book.
+Stop-Market Orders	No	Converts to a market order when triggered.
+Hidden Orders	No	Invisible but interacts with matching orders.
