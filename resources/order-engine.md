@@ -91,7 +91,7 @@ Execute Match
         - A partially executed trade means either:
             1. The incoming order is left with a buy/sell quantity > 0,
                The matched order is left with a buy/sell quantity == 0, and removed from the book
-               The incoming order is then re-checked for matches against the remaining orders in the book.
+               The incoming order is then re-checked for matches against the next best remaining orders in the book; this behavior effectively changes the market price, as each successive match happens at the next-best available price in the order book.
             2. The incoming order is left with a buy/sell quantity == 0, and not inserted into the book.
                The matched order is left with a buy/sell quantity > 0.
                The matched order is then readded into the order book.
