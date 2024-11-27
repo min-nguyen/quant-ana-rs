@@ -11,9 +11,9 @@ Each order book is usually dedicated to a specific trading pair or asset under a
    - Commodities: Individual products (e.g. Gold Futures) with a specific price asset (e.g. USD) have their own books.
 */
 pub struct OrderBook {
-    // Mapping of ordered prices to lists of orders
-    buy_orders: BTreeMap<u64, Vec<Order>>,
-    sell_orders: BTreeMap<u64, Vec<Order>>,
+    // Ordered mapping of price-times to their active limit orders
+    buy_orders: BTreeMap<OrderIndex, Order>,
+    sell_orders: BTreeMap<OrderIndex, Order>,
     id_counter: u64,
 }
 
@@ -26,44 +26,43 @@ impl OrderBook {
         }
     }
 
-    pub fn handle_order(&mut self, order: Order) -> Result<(), OrderErr> {
-        order.validate()?;
-        let buy_or_sell: OrderSide = order.side(); // copy
-                                                   // let insert_into = |m: &mut BTreeMap<_, Vec<_>>| {
-                                                   //     m.entry(order.price)
-                                                   //         .or_default() // empty vec
-                                                   //         .push(order)
-                                                   // };
-                                                   // match buy_or_sell {
-                                                   //     OrderSide::Buy => insert_into(&mut self.buy_orders),
-                                                   //     OrderSide::Sell => insert_into(&mut self.sell_orders),
-                                                   // }
-        Ok(())
-    }
+    // pub fn handle_order(&mut self, order: Order) -> Result<(), OrderErr> {
+    //     order.validate()?;
+    //     let buy_or_sell: OrderSide = order.side(); // copy
+    //                                                // let insert_into = |m: &mut BTreeMap<_, Vec<_>>| {
+    //                                                //     m.entry(order.price)
+    //                                                //         .or_default() // empty vec
+    //                                                //         .push(order)
+    //                                                // };
+    //                                                // match buy_or_sell {
+    //                                                //     OrderSide::Buy => insert_into(&mut self.buy_orders),
+    //                                                //     OrderSide::Sell => insert_into(&mut self.sell_orders),
+    //                                                // }
+    //     Ok(())
+    // }
 
     pub fn insert_limit_order(&mut self, order: Order) {
         if let Order::LimitOrder {
             side, limit_price, ..
         } = order
         {
-            let insert_into = |m: &mut BTreeMap<_, Vec<_>>| {
-                m.entry(limit_price)
-                    .or_default() // empty vec
-                    .push(order)
-            };
+            let order_idx: OrderIndex =
+                OrderIndex::new(limit_price, Utc::now().naive_local(), self.id_counter);
+            self.id_counter += 1;
+
             match side {
-                OrderSide::Buy => insert_into(&mut self.buy_orders),
-                OrderSide::Sell => insert_into(&mut self.sell_orders),
-            }
+                OrderSide::Buy => self.buy_orders.insert(order_idx, order),
+                OrderSide::Sell => self.sell_orders.insert(order_idx, order),
+            };
         }
     }
 
     pub fn best_buy_price(&self) -> Option<u64> {
-        self.buy_orders.last_key_value().map(|kv| *kv.0)
+        self.buy_orders.last_key_value().map(|kv| kv.0.price)
     }
 
     pub fn best_sell_price(&self) -> Option<u64> {
-        self.sell_orders.first_key_value().map(|kv| *kv.0)
+        self.sell_orders.first_key_value().map(|kv| kv.0.price)
     }
 
     pub fn market_price(&self, side: OrderSide) -> Option<u64> {
@@ -74,12 +73,13 @@ impl OrderBook {
     }
 }
 
-/* ##  Orders
-An order to be matched as the result of a successfully processed order request */
-#[derive(Debug)]
+/* ##  Order Index
+Ordered by member-wise comparison in the order "price, timestamp, id" (can be automatically derived)
+*/
+#[derive(Debug, PartialEq, Eq)]
 pub struct OrderIndex {
     pub price: u64,
-    pub timestamp: NaiveDateTime, // time of order process
+    pub timestamp: NaiveDateTime,
     pub id: u64,
     /*
     pub order_asset: Asset,    // asset being bought or sold
@@ -94,6 +94,25 @@ impl OrderIndex {
             timestamp,
             id,
         }
+    }
+}
+
+impl Ord for OrderIndex {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        if self.price == other.price {
+            if self.timestamp == other.timestamp {
+                return self.id.cmp(&other.id);
+            }
+            self.timestamp.cmp(&other.timestamp)
+        } else {
+            self.price.cmp(&other.price)
+        }
+    }
+}
+
+impl PartialOrd for OrderIndex {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
     }
 }
 
