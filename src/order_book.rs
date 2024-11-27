@@ -1,12 +1,10 @@
 use crate::order::{Order, OrderErr, OrderSide};
 use crate::order_queue::{OrderIndex, OrderQueue, OrderQueueError};
-use chrono::Utc;
 
 /* ## Order Book
-A list of active buy and sell orders for a particular company, trading pair, or commodity.
+Queues of available buy and sell orders for a particular company, trading pair, or commodity.
 */
 pub struct OrderBook {
-    // Ordered mapping of price-times to their active limit orders
     buy_orders: OrderQueue,
     sell_orders: OrderQueue,
     id_counter: u64,
