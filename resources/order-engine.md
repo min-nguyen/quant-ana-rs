@@ -7,10 +7,9 @@ Key components:
     The interface via which orders are created that ensures incoming orders conform to the required format and rules.
 
     An order request at least consists of:
-    - Order side: Buy or Sell
+    - Order Side: Buy or Sell
     - Asset e.g. a stock name (AAPL)
     - Quantity
-    - Price
     And also can consist of:
     - Product type: Intraday or Delivery
     - Request type:

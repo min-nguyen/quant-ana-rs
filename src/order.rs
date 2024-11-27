@@ -8,7 +8,7 @@ pub enum OrderSide {
     Sell,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Order {
     /* Instruct a system to buy/sell when opposite order is below/above threshold . */
     LimitOrder {

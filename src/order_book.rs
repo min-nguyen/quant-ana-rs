@@ -1,27 +1,22 @@
-use chrono::{NaiveDateTime, Utc};
-
 use crate::order::{Order, OrderErr, OrderSide};
-use std::collections::BTreeMap;
+use crate::order_queue::{OrderIndex, OrderQueue, OrderQueueError};
+use chrono::Utc;
 
 /* ## Order Book
 A list of active buy and sell orders for a particular company, trading pair, or commodity.
-Each order book is usually dedicated to a specific trading pair or asset under a specific base currency:
-   - Stocks: Each specific stock (e.g., AAPL) with a specific price asset (e.g. USD) has its own order book
-   - Forex: Currency pairs (e.g., EUR/USD) have separate order books.
-   - Commodities: Individual products (e.g. Gold Futures) with a specific price asset (e.g. USD) have their own books.
 */
 pub struct OrderBook {
     // Ordered mapping of price-times to their active limit orders
-    buy_orders: BTreeMap<OrderIndex, Order>,
-    sell_orders: BTreeMap<OrderIndex, Order>,
+    buy_orders: OrderQueue,
+    sell_orders: OrderQueue,
     id_counter: u64,
 }
 
 impl OrderBook {
     pub fn new() -> OrderBook {
         OrderBook {
-            buy_orders: BTreeMap::new(),
-            sell_orders: BTreeMap::new(),
+            buy_orders: OrderQueue::new(),
+            sell_orders: OrderQueue::new(),
             id_counter: 0,
         }
     }
@@ -42,27 +37,27 @@ impl OrderBook {
     // }
 
     pub fn insert_limit_order(&mut self, order: Order) {
-        if let Order::LimitOrder {
-            side, limit_price, ..
-        } = order
-        {
-            let order_idx: OrderIndex =
-                OrderIndex::new(limit_price, Utc::now().naive_local(), self.id_counter);
+        let res: Result<(), OrderQueueError> = match order.side() {
+            OrderSide::Buy => self.buy_orders.insert(self.id_counter, order),
+            OrderSide::Sell => self.sell_orders.insert(self.id_counter, order),
+        };
+        if res.is_ok() {
             self.id_counter += 1;
-
-            match side {
-                OrderSide::Buy => self.buy_orders.insert(order_idx, order),
-                OrderSide::Sell => self.sell_orders.insert(order_idx, order),
-            };
+        } else {
+            println!("Insertion error: {:?}", res)
         }
     }
 
     pub fn best_buy_price(&self) -> Option<u64> {
-        self.buy_orders.last_key_value().map(|kv| kv.0.price)
+        self.buy_orders
+            .last_key_value()
+            .map(|kv: (&OrderIndex, &Order)| kv.0.limit_price)
     }
 
     pub fn best_sell_price(&self) -> Option<u64> {
-        self.sell_orders.first_key_value().map(|kv| kv.0.price)
+        self.sell_orders
+            .first_key_value()
+            .map(|kv: (&OrderIndex, &Order)| kv.0.limit_price)
     }
 
     pub fn market_price(&self, side: OrderSide) -> Option<u64> {
@@ -70,49 +65,6 @@ impl OrderBook {
             OrderSide::Buy => self.best_buy_price(),
             OrderSide::Sell => self.best_sell_price(),
         }
-    }
-}
-
-/* ##  Order Index
-Ordered by member-wise comparison in the order "price, timestamp, id" (can be automatically derived)
-*/
-#[derive(Debug, PartialEq, Eq)]
-pub struct OrderIndex {
-    pub price: u64,
-    pub timestamp: NaiveDateTime,
-    pub id: u64,
-    /*
-    pub order_asset: Asset,    // asset being bought or sold
-    pub price_asset: Asset,    // asset used to pay for the order_asset
-    */
-}
-
-impl OrderIndex {
-    pub fn new(price: u64, timestamp: NaiveDateTime, id: u64) -> OrderIndex {
-        OrderIndex {
-            price,
-            timestamp,
-            id,
-        }
-    }
-}
-
-impl Ord for OrderIndex {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        if self.price == other.price {
-            if self.timestamp == other.timestamp {
-                return self.id.cmp(&other.id);
-            }
-            self.timestamp.cmp(&other.timestamp)
-        } else {
-            self.price.cmp(&other.price)
-        }
-    }
-}
-
-impl PartialOrd for OrderIndex {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
     }
 }
 
@@ -168,12 +120,12 @@ mod test {
     #[test]
     fn test_insert_limit_order() {
         let book: OrderBook = order_book();
-        assert_eq!(book.buy_orders.len(), 2);
-        assert_eq!(book.sell_orders.len(), 2);
-        assert_eq!(book.buy_orders.get(&(690)).unwrap().len(), 2);
-        assert_eq!(book.buy_orders.get(&(685)).unwrap().len(), 1);
-        assert_eq!(book.sell_orders.get(&(700)).unwrap().len(), 2);
-        assert_eq!(book.sell_orders.get(&(705)).unwrap().len(), 1);
+        assert_eq!(book.buy_orders.len(), 3);
+        assert_eq!(book.sell_orders.len(), 3);
+        assert_eq!(book.buy_orders.get_by_limit_price(690).len(), 2);
+        assert_eq!(book.buy_orders.get_by_limit_price(685).len(), 1);
+        assert_eq!(book.sell_orders.get_by_limit_price(700).len(), 2);
+        assert_eq!(book.sell_orders.get_by_limit_price(705).len(), 1);
     }
 
     #[test]
