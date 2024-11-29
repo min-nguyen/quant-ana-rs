@@ -21,20 +21,11 @@ impl OrderBook {
 
     // pub fn handle_order(&mut self, order: Order) -> Result<(), OrderErr> {
     //     order.validate()?;
-    //     let buy_or_sell: OrderSide = order.side(); // copy
-    //                                                // let insert_into = |m: &mut BTreeMap<_, Vec<_>>| {
-    //                                                //     m.entry(order.price)
-    //                                                //         .or_default() // empty vec
-    //                                                //         .push(order)
-    //                                                // };
-    //                                                // match buy_or_sell {
-    //                                                //     OrderSide::Buy => insert_into(&mut self.buy_orders),
-    //                                                //     OrderSide::Sell => insert_into(&mut self.sell_orders),
-    //                                                // }
+    //     let buy_or_sell: OrderSide = order.side();
     //     Ok(())
     // }
 
-    pub fn insert_limit_order(&mut self, order: Order) {
+    fn insert_limit_order(&mut self, order: Order) {
         let res: Result<(), OrderQueueError> = match order.side() {
             OrderSide::Buy => self.buy_orders.insert(self.id_counter, order),
             OrderSide::Sell => self.sell_orders.insert(self.id_counter, order),
@@ -73,45 +64,43 @@ mod test {
     };
 
     fn order_book() -> OrderBook {
-        let mut book = OrderBook::new();
-
-        let buy_order_1 = Order::LimitOrder {
-            side: Buy,
-            limit_price: 690,
-            quantity: 35,
-        };
-        let buy_order_2 = Order::LimitOrder {
-            side: Buy,
-            limit_price: 685,
-            quantity: 30,
-        };
-        let buy_order_3 = Order::LimitOrder {
-            side: Buy,
-            limit_price: 690,
-            quantity: 15,
-        };
-
-        let sell_order_1 = Order::LimitOrder {
-            side: Sell,
-            limit_price: 700,
-            quantity: 10,
-        };
-        let sell_order_2 = Order::LimitOrder {
-            side: Sell,
-            limit_price: 705,
-            quantity: 25,
-        };
-        let sell_order_3 = Order::LimitOrder {
-            side: Sell,
-            limit_price: 700,
-            quantity: 30,
-        };
-        book.insert_limit_order(buy_order_1);
-        book.insert_limit_order(buy_order_2);
-        book.insert_limit_order(buy_order_3);
-        book.insert_limit_order(sell_order_1);
-        book.insert_limit_order(sell_order_2);
-        book.insert_limit_order(sell_order_3);
+        let mut book: OrderBook = OrderBook::new();
+        let limit_orders: Vec<Order> = vec![
+            Order::LimitOrder {
+                side: Buy,
+                limit_price: 690,
+                quantity: 35,
+            },
+            Order::LimitOrder {
+                side: Buy,
+                limit_price: 685,
+                quantity: 30,
+            },
+            Order::LimitOrder {
+                side: Buy,
+                limit_price: 690,
+                quantity: 15,
+            },
+            Order::LimitOrder {
+                side: Sell,
+                limit_price: 700,
+                quantity: 10,
+            },
+            Order::LimitOrder {
+                side: Sell,
+                limit_price: 705,
+                quantity: 25,
+            },
+            Order::LimitOrder {
+                side: Sell,
+                limit_price: 700,
+                quantity: 30,
+            },
+        ];
+        6;
+        limit_orders
+            .into_iter()
+            .for_each(|order| book.insert_limit_order(order));
         book
     }
 
@@ -132,4 +121,9 @@ mod test {
         assert_eq!(book.best_buy_price().unwrap(), 690);
         assert_eq!(book.best_sell_price().unwrap(), 700);
     }
+
+    // #[test]
+    // fn test_handle_order() {
+    //     let book: OrderBook = order_book();
+    // }
 }

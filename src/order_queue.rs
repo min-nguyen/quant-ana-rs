@@ -63,7 +63,7 @@ impl DerefMut for OrderQueue {
 }
 
 /* ##  Order Index
-Ordered member-wise i.e. in the order "price, timestamp, id" (can be automatically derived)
+Ordered member-wise i.e. in the order "price, timestamp, id" (can also be automatically derived)
 */
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct OrderIndex {
@@ -105,9 +105,6 @@ impl PartialOrd for OrderIndex {
     }
 }
 
-/* ##  Order Index
-Ordered by member-wise comparison in the order "price, timestamp, id" (can be automatically derived)
-*/
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum OrderQueueError {
     OrderIdExists,
