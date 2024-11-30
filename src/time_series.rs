@@ -13,22 +13,17 @@ use std::{
 const BASE_URL: &str = "https://www.alphavantage.co/query";
 const API_KEY: &str = "API_KEY";
 
-// #[tokio::test]
-// async fn test_get_time_series() -> Result<(), Box<dyn Error>> {
-//     let ts = TimeSeries::get_time_series("AAPL", TimeSeriesType::Daily).await?;
-//     println!("{:?}", ts);
-//     Ok(())
-//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::DailyAdjusted).await?;
-//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::Weekly).await?;
-//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::WeeklyAdjusted).await?;
-//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::Monthly).await?;
-//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::MonthlyAdjusted).await
-// }
-
 #[tokio::test]
 async fn test_read_time_series() -> Result<(), Box<dyn Error>> {
     let ts = TimeSeries::read_time_series("data/ibm_time_series_daily.json").await?;
     let ts = TimeSeries::read_time_series("data/ibm_time_series_intraday.json").await?;
+    println!("{:?}", ts);
+    Ok(())
+}
+
+// #[tokio::test]
+async fn test_get_time_series() -> Result<(), Box<dyn Error>> {
+    let ts = TimeSeries::get_time_series("AAPL", TimeSeriesType::Daily).await?;
     println!("{:?}", ts);
     Ok(())
 }
@@ -107,12 +102,17 @@ where
             else {
                 NaiveDateTime::parse_from_str(&k, "%Y-%m-%d %H:%M:%S")
                     .map(|time| ((time, v)))
-                    .map_err(|_| de::Error::custom(format!("Failed to parse datetime: {}", k)))
+                    .map_err(|_| {
+                        de::Error::custom(format!(
+                            "Failed to parse from both %Y-%m-%d and %Y-%m-%d %H:%M:%S:{}",
+                            k
+                        ))
+                    })
             }
         })
         .collect()
-    // Transforms the iterator of Result into a single Result<HashMap<NaiveDateTime, TimeSeriesEntry>, D::Error>.
-    // If any Result is an Err, collect() propagates the error immediately.
+    // collect() collapses an iterator of Result<(NaiveDateTime, TimeSeriesEntry), D::Error> into a HashMap.
+    // if any Result is an Err, propagates the error immediately.
 }
 
 #[derive(Deserialize, Debug)]
