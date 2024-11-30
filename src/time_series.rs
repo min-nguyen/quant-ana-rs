@@ -3,7 +3,7 @@ use chrono::{Date, NaiveDate, NaiveDateTime, ParseError};
     Retrieval of time series market data from Alphavantage (https://www.alphavantage.co/documentation/)
 */
 use reqwest::get;
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{de, Deserialize, Deserializer, Serialize};
 use std::{
     collections::HashMap,
     error::Error,
@@ -94,23 +94,25 @@ where
         .map(|(_, value)| value)
         .ok_or_else(|| serde::de::Error::custom("Missing time series data"))?;
 
-    let m_: HashMap<NaiveDateTime, TimeSeriesEntry> = m
-        .into_iter()
-        .filter_map(|(k, v)| {
+    m.into_iter()
+        .map(|(k, v)| {
             // %Y-%m-%d
             if let Ok(datetime) = NaiveDate::parse_from_str(&k, "%Y-%m-%d") {
-                datetime.and_hms_opt(0, 0, 0).map(|time| ((time, v)))
+                Ok(datetime
+                    .and_hms_opt(0, 0, 0)
+                    .map(|time| ((time, v)))
+                    .unwrap())
             }
             // %Y-%m-%d %H:%M:%S
             else {
                 NaiveDateTime::parse_from_str(&k, "%Y-%m-%d %H:%M:%S")
-                    .ok()
                     .map(|time| ((time, v)))
+                    .map_err(|_| de::Error::custom(format!("Failed to parse datetime: {}", k)))
             }
         })
-        .collect();
-
-    Ok(m_)
+        .collect()
+    // Transforms the iterator of Result into a single Result<HashMap<NaiveDateTime, TimeSeriesEntry>, D::Error>.
+    // If any Result is an Err, collect() propagates the error immediately.
 }
 
 #[derive(Deserialize, Debug)]
