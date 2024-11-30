@@ -1,3 +1,4 @@
+use chrono::{Date, NaiveDate, NaiveDateTime, ParseError};
 /*
     Retrieval of time series market data from Alphavantage (https://www.alphavantage.co/documentation/)
 */
@@ -12,21 +13,22 @@ use std::{
 const BASE_URL: &str = "https://www.alphavantage.co/query";
 const API_KEY: &str = "API_KEY";
 
-#[tokio::test]
-async fn test_get_time_series() -> Result<(), Box<dyn Error>> {
-    let ts = TimeSeries::get_time_series("AAPL", TimeSeriesType::Daily).await?;
-    println!("{:?}", ts);
-    Ok(())
-    // TimeSeries::get_time_series("AAPL", TimeSeriesType::DailyAdjusted).await?;
-    // TimeSeries::get_time_series("AAPL", TimeSeriesType::Weekly).await?;
-    // TimeSeries::get_time_series("AAPL", TimeSeriesType::WeeklyAdjusted).await?;
-    // TimeSeries::get_time_series("AAPL", TimeSeriesType::Monthly).await?;
-    // TimeSeries::get_time_series("AAPL", TimeSeriesType::MonthlyAdjusted).await
-}
+// #[tokio::test]
+// async fn test_get_time_series() -> Result<(), Box<dyn Error>> {
+//     let ts = TimeSeries::get_time_series("AAPL", TimeSeriesType::Daily).await?;
+//     println!("{:?}", ts);
+//     Ok(())
+//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::DailyAdjusted).await?;
+//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::Weekly).await?;
+//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::WeeklyAdjusted).await?;
+//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::Monthly).await?;
+//     // TimeSeries::get_time_series("AAPL", TimeSeriesType::MonthlyAdjusted).await
+// }
 
 #[tokio::test]
 async fn test_read_time_series() -> Result<(), Box<dyn Error>> {
     let ts = TimeSeries::read_time_series("data/ibm_time_series_daily.json").await?;
+    let ts = TimeSeries::read_time_series("data/ibm_time_series_intraday.json").await?;
     println!("{:?}", ts);
     Ok(())
 }
@@ -76,13 +78,48 @@ impl Display for Interval {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+fn deserialize_time_series<'de, D>(
+    deserializer: D,
+) -> Result<HashMap<NaiveDateTime, TimeSeriesEntry>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    /* Deserialize to a single-entry HashMap (whose key is dynamic) and extract the only value */
+    let map: HashMap<String, HashMap<String, TimeSeriesEntry>> =
+        HashMap::deserialize(deserializer)?;
+
+    let m = map
+        .into_iter()
+        .next()
+        .map(|(_, value)| value)
+        .ok_or_else(|| serde::de::Error::custom("Missing time series data"))?;
+
+    let m_: HashMap<NaiveDateTime, TimeSeriesEntry> = m
+        .into_iter()
+        .filter_map(|(k, v)| {
+            // %Y-%m-%d
+            if let Ok(datetime) = NaiveDate::parse_from_str(&k, "%Y-%m-%d") {
+                datetime.and_hms_opt(0, 0, 0).map(|time| ((time, v)))
+            }
+            // %Y-%m-%d %H:%M:%S
+            else {
+                NaiveDateTime::parse_from_str(&k, "%Y-%m-%d %H:%M:%S")
+                    .ok()
+                    .map(|time| ((time, v)))
+            }
+        })
+        .collect();
+
+    Ok(m_)
+}
+
+#[derive(Deserialize, Debug)]
 pub struct TimeSeries {
     #[serde(rename = "Meta Data")]
     meta_data: MetaData,
     #[serde(flatten)]
     #[serde(deserialize_with = "deserialize_time_series")]
-    time_series: HashMap<String, TimeSeriesEntry>,
+    time_series: HashMap<NaiveDateTime, TimeSeriesEntry>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -141,20 +178,6 @@ impl TimeSeries {
         let ts: TimeSeries = serde_json::from_str(&content)?;
         Ok(ts)
     }
-}
 
-fn deserialize_time_series<'de, D>(
-    deserializer: D,
-) -> Result<HashMap<String, TimeSeriesEntry>, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    /* Deserialize to a single-entry HashMap (whose key is dynamic) and extract the only value */
-    let map: HashMap<String, HashMap<String, TimeSeriesEntry>> =
-        HashMap::deserialize(deserializer)?;
-
-    map.into_iter()
-        .next()
-        .map(|(_, value)| value)
-        .ok_or_else(|| serde::de::Error::custom("Missing time series data"))
+    // pub fn
 }
