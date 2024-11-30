@@ -3,7 +3,6 @@
 */
 use reqwest::get;
 use serde::{Deserialize, Deserializer, Serialize};
-use serde_json::Value;
 use std::{
     collections::HashMap,
     error::Error,
@@ -23,6 +22,13 @@ async fn test_get_time_series() -> Result<(), Box<dyn Error>> {
     // TimeSeries::get_time_series("AAPL", TimeSeriesType::WeeklyAdjusted).await?;
     // TimeSeries::get_time_series("AAPL", TimeSeriesType::Monthly).await?;
     // TimeSeries::get_time_series("AAPL", TimeSeriesType::MonthlyAdjusted).await
+}
+
+#[tokio::test]
+async fn test_read_time_series() -> Result<(), Box<dyn Error>> {
+    let ts = TimeSeries::read_time_series("data/ibm_time_series_daily.json").await?;
+    println!("{:?}", ts);
+    Ok(())
 }
 
 /* ----------------------------------------------------------- */
@@ -110,7 +116,7 @@ struct TimeSeriesEntry {
 }
 
 impl TimeSeries {
-    async fn get_time_series(
+    pub async fn get_time_series(
         symbol: &str,
         ts: TimeSeriesType,
     ) -> Result<TimeSeries, Box<dyn Error>> {
@@ -125,10 +131,15 @@ impl TimeSeries {
             url
         };
 
-        let rsp_body: String = get(&url).await?.text().await?;
+        let body: String = get(&url).await?.text().await?;
+        let ts: TimeSeries = serde_json::from_str(&body)?;
+        Ok(ts)
+    }
 
-        let data: TimeSeries = serde_json::from_str(&rsp_body)?;
-        Ok(data)
+    pub async fn read_time_series(path: &str) -> Result<TimeSeries, Box<dyn std::error::Error>> {
+        let content: String = tokio::fs::read_to_string(path).await?;
+        let ts: TimeSeries = serde_json::from_str(&content)?;
+        Ok(ts)
     }
 }
 
