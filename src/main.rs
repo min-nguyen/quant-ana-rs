@@ -1,8 +1,8 @@
 pub mod plot;
 pub mod time_series;
 
-// #[main]
-fn main() {}
+#[tokio::main]
+async fn main() {}
 
 // #[macro_use]
 // extern crate diesel;

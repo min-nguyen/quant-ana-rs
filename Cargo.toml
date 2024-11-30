@@ -1,7 +1,20 @@
 [package]
-name = "quant-anal-rs"
+name = "quant-ana-rs"
 version = "0.1.0"
 edition = "2021"
+
+[[bin]]
+name = "main"
+path="src/main.rs"
+test = false
+
+[lib]
+name = "quant_ana"
+path="src/main.rs"
+
+[[bench]]
+name = "bench"
+harness = false
 
 [dependencies]
 reqwest = "0.11"
@@ -16,3 +29,4 @@ chrono = { version = "0.4.38" }
 bigdecimal = "0.4.6"
 itertools = "0.13.0"
 plotters = { version = "^0.3.5"}
+criterion = { version = "0.4", features = ["html_reports"] }

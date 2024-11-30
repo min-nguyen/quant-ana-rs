@@ -16,8 +16,8 @@ const API_KEY: &str = "API_KEY";
 
 #[tokio::test]
 async fn test_read_time_series() -> Result<(), Box<dyn Error>> {
-    let _ = TimeSeries::read_time_series("data/ibm_time_series_daily.json").await?;
-    let ts = TimeSeries::read_time_series("data/ibm_time_series_intraday.json").await?;
+    let _: TimeSeries = TimeSeries::read_time_series("data/ibm_time_series_daily.json").await?;
+    let ts: TimeSeries = TimeSeries::read_time_series("data/ibm_time_series_intraday.json").await?;
     println!("{:?}", ts);
     Ok(())
 }
