@@ -1,5 +1,5 @@
 [package]
-name = "order-engine"
+name = "quant-anal-rs"
 version = "0.1.0"
 edition = "2021"
 
